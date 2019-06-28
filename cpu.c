@@ -81,13 +81,13 @@ void gen(struct cpu *cpu, unsigned int op, unsigned char regA, unsigned char reg
 /**
  * PC handler functions 
  */
-void pc(struct cpu *cpu, unsigned int op, unsigned char regA)
+void pc(struct cpu *cpu, unsigned int op, unsigned char regA, int operands)
 {
     switch (op)
     {
     case CALL:
         cpu->reg[7]--;
-        cpu_ram_write(cpu, cpu->reg[7], cpu->pc + 2);
+        cpu_ram_write(cpu, cpu->reg[7], cpu->pc + operands + 1);
         cpu->pc = cpu->reg[regA];
         break;
     case RET:
@@ -104,10 +104,18 @@ void pc(struct cpu *cpu, unsigned int op, unsigned char regA)
         }
         else
         {
-            cpu->pc += 2;
+            cpu->pc += operands + 1;
         }
         break;
     case JNE:
+        if (cpu->fl ^ ETF)
+        {
+            cpu->pc = cpu->reg[regA];
+        }
+        else
+        {
+            cpu->pc += operands + 1;
+        }
         break;
     default:
         fprintf(stderr, "Error - PC Instruction Unknown {%d}\n", op);
@@ -194,7 +202,7 @@ void cpu_run(struct cpu *cpu)
             cpu->pc += operands + 1;
             break;
         case PC:
-            pc(cpu, IR, operandA);
+            pc(cpu, IR, operandA, operands);
             break;
         case ALU:
             if (IR == DIV && operandB == 0)
