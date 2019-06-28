@@ -38,6 +38,8 @@ struct cpu
 #define JMP 0b01010100
 #define JEQ 0b01010101
 
+#define JNE 0b01010110
+
 #define ALU 0b0010
 #define ADD 0b10100000
 #define SUB 0b10100001
